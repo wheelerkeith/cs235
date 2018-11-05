@@ -1,0 +1,340 @@
+/***********************************************************************
+ * Module:
+ *    Week 02, Stack
+ *    Brother JonesL, CS 235
+ * Author:
+ *    Nik, Tyler, Keith
+ * Summary:
+ *    This program will implement the testInfixToPostfix()
+ *    and testInfixToAssembly() functions
+ ************************************************************************/
+
+#include <iostream>    // for ISTREAM and COUT
+#include <string>      // for STRING
+#include <cassert>     // for ASSERT
+#include <cctype>
+#include "stack.h"     // for STACK
+using namespace std;
+
+
+/*****************************************************
+ * CONVERT INFIX TO POSTFIX
+ * Convert infix equation "5 + 2" into postifx "5 2 +"
+ * This one is difficult, so I'll break it up
+ *****************************************************/
+string convertInfixToPostfix(const string & infix)
+{
+  //test is the test char to be put on the stack
+  // or string. topTest is just when I need to clone it
+  char test,
+       topTest;
+  //the operator stack is one at a time, so chars
+  Stack <char> opStack;
+  string postfix;
+  //level keeps the order of operation in a stack.
+  int level = 0;
+  //bool logic whether or not to quit a stack.
+  bool keepPopping = true;
+  const string BLANK = " ";
+  for(int i = 0; i < infix.length(); i++)
+  {
+    test = infix[i];
+    //ignore blank spaces
+    if(test == ' ')
+    {
+    }
+    // '(' has highest priority
+    else if(test == '(')
+    {
+      //put on the stack, no question
+      opStack.push(test);
+      //whatever is next is highest priority
+      level = 5;
+    }
+    //')' kicks everything off, low priority
+    else if(test == ')')
+    {
+      for(;;)
+      {
+        assert(!opStack.empty());
+        topTest = opStack.top();
+        opStack.pop();
+        level = 1;
+        if (topTest == '(')
+          break;
+        postfix.append(BLANK + topTest);
+      }
+    }
+    //next lowest, '+', and '-'.
+    //It has the same template as the rest
+    else if (test == '+' || test == '-')
+    {
+      //if it's in parenthesis, do it
+      if (level == 5) 
+      {
+        opStack.push(test);
+      }
+      //does it belong
+      else if (level < 2)
+      {
+        opStack.push(test);
+        level = 2;
+      }
+      else
+      {
+        //keep checking the stack
+        while(keepPopping == true)
+        {
+          //pop off an operator from the stack
+          topTest = opStack.top();
+          opStack.pop();
+          postfix.append(BLANK + topTest);
+          //if it's not empty, compare priorities with the next
+          if (!opStack.empty())
+          {
+            //blank, but it's a template
+            if (opStack.top()=='+'||opStack.top()=='-')
+            {
+            }
+            else if (opStack.top()=='*'||opStack.top()=='/'
+                     ||opStack.top()=='%')
+            {
+            }
+            else if (opStack.top()=='^')
+            {
+            }
+          }
+          //quit if the stack's empty
+          else if (opStack.empty())
+          {
+            keepPopping = false;
+          }
+          //when done comparing, throw itself on stack
+          if (keepPopping == false)
+            opStack.push(test);
+          //priority level
+          level = 2;
+        }
+        //reset the bool
+        keepPopping = true;
+      }
+    }
+    //Next operators are equal order of operation.
+    //same template as above.
+    else if (test == '*' || test == '/' || test == '%')
+    {
+      if (level == 5)
+      {
+        opStack.push(test);
+      }
+      else if (level < 3)
+      {
+        opStack.push(test);
+        level = 3;
+      }
+      else
+      {
+        while(keepPopping == true)
+        {
+          topTest = opStack.top();
+          opStack.pop();
+          postfix.append(BLANK + topTest);
+          if (!opStack.empty())
+          {
+            //can add to stack if lower priority are on.
+            if (opStack.top()=='+'||opStack.top()=='-')
+            {
+              keepPopping = false;
+            }
+            else if (opStack.top()=='*'||opStack.top()=='/'||opStack.top()=='%')
+            {
+            }
+            else if (opStack.top()=='^')
+            {
+            }
+          }
+          else if (opStack.empty())
+          {
+            keepPopping = false;
+          }
+          if (keepPopping == false)
+            opStack.push(test);
+          level = 2;
+        }
+        keepPopping = true;
+      }
+    }
+    //Highest outside of parenthesis
+    else if (test == '^')
+    {
+      if (level == 5)
+      {
+        opStack.push(test);
+      }
+      else if (level < 4)
+      {
+        opStack.push(test);
+        level = 4;
+      }
+      else
+      {
+        while(keepPopping == true)
+        {
+          topTest = opStack.top();
+          opStack.pop();
+          postfix.append(BLANK + topTest);
+          if (!opStack.empty())
+          {
+            if (opStack.top()=='+'||opStack.top()=='-')
+            {
+              keepPopping = false;
+            }
+            else if (opStack.top()=='*'||opStack.top()=='/'||opStack.top()=='%')
+            {
+              keepPopping = false;
+            }
+            else if (opStack.top()=='^')
+            {
+            }
+          }
+          else if (opStack.empty())
+          {
+            keepPopping = false;
+          }
+          if (keepPopping == false)
+            opStack.push(test);
+          level = 2;
+        }
+        keepPopping = true;
+      }
+    }
+    //For everything outside of operations, throw to stack
+    else
+    {
+      postfix += (BLANK + test);
+      for (;;)
+      {
+        if ( !isalnum(infix[i+1]) && infix[i+1] != '.')
+          break;
+        i++;
+        test = infix[i];
+        postfix.append(1 , test);
+      }
+    }
+  }
+  //Infix is over, time to dump all the stack at the end.
+  for(;;)
+  {
+    if(opStack.empty())
+    {
+      break;
+    }
+    topTest = opStack.top();
+    opStack.pop();
+    if(topTest != '(')
+    {
+      postfix.append(BLANK + topTest);
+    }
+    else
+    {
+      cout << "*** Error in infix expression *** \n";
+      break;
+    }
+  }
+  return postfix;
+}
+
+/*****************************************************
+ * TEST INFIX TO POSTFIX
+ * Prompt the user for infix text and display the
+ * equivalent postfix expression
+ *****************************************************/
+void testInfixToPostfix()
+{
+   string input;
+   cout << "Enter an infix equation.  Type \"quit\" when done.\n";
+
+   do
+   {
+      // handle errors
+      if (cin.fail())
+      {
+         cin.clear();
+         cin.ignore(256, '\n');
+      }
+
+      // prompt for infix
+      cout << "infix > ";
+      getline(cin, input);
+
+      // generate postfix
+      if (input != "quit")
+      {
+         string postfix = convertInfixToPostfix(input);
+         cout << "\tpostfix: " << postfix << endl << endl;
+      }
+   }
+   while (input != "quit");
+}
+
+/**********************************************
+ * CONVERT POSTFIX TO ASSEMBLY
+ * Convert postfix "5 2 +" to assembly:
+ *     LOAD 5
+ *     ADD 2
+ *     STORE VALUE1
+ **********************************************/
+string convertPostfixToAssembly(const string & postfix)
+{
+   string assembly;
+   Stack<int> lost;
+   int first;
+   int second;
+   char op;
+   char x;
+
+   for (int t = 0; t < postfix.length(); t++)
+   {
+      x = postfix[t];
+
+      if (x == ' ')
+      {}
+   }
+
+   return assembly;
+}
+
+/*****************************************************
+ * TEST INFIX TO ASSEMBLY
+ * Prompt the user for infix text and display the
+ * resulting assembly instructions
+ *****************************************************/
+void testInfixToAssembly()
+{
+   string input;
+   cout << "Enter an infix equation.  Type \"quit\" when done.\n";
+
+   do
+   {
+      // handle errors
+      if (cin.fail())
+      {
+         cin.clear();
+         cin.ignore(256, '\n');
+      }
+
+      // prompt for infix
+      cout << "infix > ";
+      getline(cin, input);
+
+      // generate postfix
+      if (input != "quit")
+      {
+         string postfix = convertInfixToPostfix(input);
+         cout << convertPostfixToAssembly(postfix);
+      }
+   }
+   while (input != "quit");
+
+}
+

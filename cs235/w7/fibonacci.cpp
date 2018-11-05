@@ -1,0 +1,170 @@
+/***********************************************************************
+ * Implementation:
+ *    FIBONACCI
+ * Summary:
+ *    This will contain the implementation for fibonacci() as well as any
+ *    other function or class implementations you may need
+ * Author
+ *    <your names here>
+ **********************************************************************/
+
+#include <iostream>
+#include <iomanip>
+#include "fibonacci.h"   // for fibonacci() prototype
+#include "list.h"        // for LIST
+using namespace std;
+
+
+class WholeNumber
+{
+public:
+   List <int> number;
+   
+   
+   void display (ostream & out);
+   WholeNumber & operator = (WholeNumber & rhs);
+   WholeNumber & operator += (WholeNumber & add);
+   
+   void change (WholeNumber & rhs)
+   {
+      Node <int>* temp = this->number.tail;
+      this->number.tail = rhs.number.tail;
+      rhs.number.tail = temp;
+   }
+};
+
+WholeNumber & WholeNumber :: operator = (WholeNumber & rhs)
+{
+   this->number = rhs.number;
+}
+
+WholeNumber & WholeNumber :: operator += (WholeNumber & add)
+{
+   WholeNumber sum;
+   int first;
+   int second;
+   int result;
+   int carry = 0;
+   change (add);
+   ListIterator <int> x = number.tail;
+   ListIterator <int> y = add.number.tail;
+   
+   while (x != number.rend() || y != add.number.rend())
+   {
+      if (x != number.rend())
+      {
+         first = *x;
+         x--;
+      }
+      else
+      {
+         first = 0;
+      }
+      
+      if (y != add.number.rend())
+      {
+         second = *y;
+         y--;
+      }
+      else
+      {
+         second = 0;
+      }
+      
+      int temp;
+      temp = first + second + carry;
+      result = temp % 1000;
+      carry = temp / 1000;
+      sum.number.push_front (result);
+   }
+   
+   if (carry > 0)
+   {
+      sum.number.push_front (carry);
+   }
+   
+   *this = sum;
+   return *this;
+}
+
+inline ostream & operator << (ostream & out, WholeNumber & rhs)
+{
+   rhs.display (out);
+   return out;
+}
+
+void WholeNumber :: display (ostream & out) //const
+{
+   ListIterator <int> it = number.head;
+   out << setw (1) << *it;
+   it++;
+   
+   if (it != number.end())
+   {
+      out << ",";
+   }
+   
+   for (;;)
+   {
+      if (it == number.end())
+      {
+         return;
+      }
+      
+      out << setfill ('0') << setw (3) << *it;
+      it++;
+      
+      if (it != number.end())
+      {
+         out << ",";
+      }
+   }
+}
+
+
+
+/************************************************
+ * FIBONACCI
+ * The interactive function allowing the user to
+ * display Fibonacci numbers
+ ***********************************************/
+void fibonacci()
+{
+   // show the first serveral Fibonacci numbers
+   int number;
+   cout << "How many Fibonacci numbers would you like to see? ";
+   cin  >> number;
+
+   WholeNumber first;
+   WholeNumber second;
+   first.number.push_back (0);
+   second.number.push_back (1);
+
+   for (int i = 0; i < number; i++)
+   {
+      first += second;
+      cout << "\t" << first << endl;
+   }
+   
+
+   // prompt for a single large Fibonacci
+   cout << "Which Fibonacci number would you like to display? ";
+   cin  >> number;
+
+
+   WholeNumber third;
+   WholeNumber fourth;
+   third.number.push_back (0);
+   fourth.number.push_back (1);
+
+   for (int i = 0; i < number; i++)
+   {
+      third += fourth;
+   }
+
+   cout << "\t" << third << endl;
+   
+
+}
+
+

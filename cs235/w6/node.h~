@@ -1,0 +1,74 @@
+/*******************************************************************
+ * node.h
+ *
+ * Contains the class definition of a Node/List
+ *
+ *******************************************************************/
+#ifndef NODE_H
+#define NODE_H
+
+#include <iostream>
+#include <cassert>
+using namespace std;
+
+
+template<class T>
+class Node
+{
+  public:
+  T data;                  // --- data in each node
+  Node *pNext;             // --- pointer to next node
+
+  Node(): pNext(NULL) {};                  // constructor
+  Node(T type) : data(type)  {};              // non default constructor
+  ~Node();
+};
+
+/****************************************
+ * Empty
+ * Empty a linked list by deleting each Node
+ ****************************************/
+void empty()
+{
+}
+
+/************************************
+ * Insert
+ * Add a node to the list with data
+ ************************************/
+template <class T>
+Node<T> * insert(T value, Node<T> *& p)
+{
+   
+   p = new Node<T> (value);
+   
+
+   return p;
+}
+
+/************************************
+ * Insert
+ * Add a node to the list with data
+ ************************************/
+template <class T>
+Node<T> * insert(T value, Node<T> *& p, bool head)
+{
+   
+   p = new Node<T> (value);
+   
+
+   return p;
+
+
+template <class T>
+Node<T> * copy(Node<T> *& pointer)
+{
+   
+}
+
+template <class T>
+void freeData(Node<T> *& pHead)
+{
+}
+
+#endif

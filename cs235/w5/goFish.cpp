@@ -1,0 +1,77 @@
+/***********************************************************************
+* Program:
+*    Assignment 01, Go Fish
+*    Brother Helfrich, CS 235
+* Author:
+*    <your names here>
+* Summary: 
+*    This is all the functions necessary to play Go Fish!
+*
+*    Estimated:  0.0 hrs   
+*    Actual:     0.0 hrs
+*      Please describe briefly what was the most difficult part.
+************************************************************************/
+
+#include <iostream>
+#include <fstream>
+#include <set>
+#include "card.h"
+#include "goFish.h"
+using namespace std;
+
+/**********************************************************************
+ * GO FISH
+ * The function which starts it all
+ ***********************************************************************/
+void goFish()
+{
+   set <Card> hand;
+   set <Card> :: iterator  it;
+   Card card;
+   int matches = 0;
+   int round = 1;
+   int remain = 5;
+   cout << "We will play 5 rounds of Go Fish.  Guess the card in the hand\n";
+
+   ifstream fin("/home/cs235/week05/hand.txt");
+   for (int i = 0; i <= 5; i++)
+   {
+      fin >> card;
+      hand.insert(card);
+   }
+   fin.close();
+
+   while (round <= 5)
+   {
+      cout << "round " << round << ": ";
+      cin >> card;
+
+      it = hand.find(card);
+
+      if (it != hand.end())
+      {
+         cout << "\tYou got a match!\n";
+         hand.erase(card);
+         matches++;
+         remain--;
+      }
+      else
+         cout << "\tGo Fish!\n";
+      round++;
+   }
+
+   cout << "You have " << matches << " matches!\n";
+   cout << "The remaining cards: ";
+   for (it = hand.begin(); it != hand.end(); ++it)
+   {
+      cout << *it;
+      if (remain != 0)
+         cout << ", ";
+      remain--;
+   }
+
+   cout << endl;
+   
+   
+   return ;
+}
